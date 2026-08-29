@@ -474,7 +474,8 @@ do
             end
         end)
     end
-endlocal SkidFling = function(TargetPlayer)
+end
+local SkidFling = function(TargetPlayer)
     if not TargetPlayer or not TargetPlayer.Character then return end
 
     local Character = Player and Player.Character
@@ -659,14 +660,12 @@ function Modules.getPredictedPosition(player)
 
     local vel = hrp.AssemblyLinearVelocity or hrp.Velocity or Vector3.new(0,0,0)
     
-    -- Get distance for better prediction
     local localHRP = Modules.Character and Modules.Character:FindFirstChild("HumanoidRootPart")
-    local distance = 50 -- Default distance
+    local distance = 50
     if localHRP then
         distance = (hrp.Position - localHRP.Position).Magnitude
     end
     
-    -- Get ping for lag compensation
     local ping = 0
     pcall(function()
         if Modules.Player and typeof(Modules.Player.GetNetworkPing) == "function" then
@@ -676,7 +675,6 @@ function Modules.getPredictedPosition(player)
     if type(ping) ~= "number" then ping = tonumber(ping) or 0 end
     if ping > 1 then ping = ping / 1000 end
 
-    -- Adjust prediction time based on distance and ping
     local predictionTime = math.clamp(distance / 100, 0.05, 0.15) + ping
 
     return hrp.Position + vel * predictionTime
@@ -686,7 +684,6 @@ function Modules.ShootMurdererOnce()
     local localplayer = Modules.Player
     if not localplayer or not localplayer.Character then return end
     
-    -- Check if player is sheriff or hero
     local function findSheriff(player)
         if not player or not player.Character then return false end
         local character = player.Character
@@ -695,10 +692,9 @@ function Modules.ShootMurdererOnce()
     end
     
     if not findSheriff(localplayer) then
-        return -- Not sheriff/hero
+        return
     end
     
-    -- Find target (murderer or sheriff that's not me)
     local target = Modules.FindMurderer() or Modules.FindSheriffThatsNotMe()
     if not target or not target.Character then return end
     
@@ -706,26 +702,23 @@ function Modules.ShootMurdererOnce()
     local lHRP = localplayer.Character:FindFirstChild("HumanoidRootPart")
     if not mHRP or not lHRP then return end
 
-    -- Equip gun if not equipped
     if not localplayer.Character:FindFirstChild("Gun") then
         local tool = localplayer.Backpack and localplayer.Backpack:FindFirstChild("Gun")
         if tool and localplayer.Character:FindFirstChildOfClass("Humanoid") then
             pcall(function() 
                 localplayer.Character.Humanoid:EquipTool(tool)
-                task.wait(0.3) -- Wait for gun to equip
+                task.wait(0.3)
             end)
         else
-            return -- No gun available
+            return
         end
     end
     
-    -- Get the gun and shoot remote
     local gun = localplayer.Character:FindFirstChild("Gun")
     if not gun then return end
     
     local shootRemote = gun:FindFirstChild("Shoot")
     if not shootRemote then
-        -- Try to find it with WaitForChild as fallback
         local success, result = pcall(function()
             return gun:WaitForChild("Shoot", 1)
         end)
@@ -736,15 +729,12 @@ function Modules.ShootMurdererOnce()
     
     if not shootRemote then return end
     
-    -- Get predicted position
     local predictedPos = Modules.getPredictedPosition(target)
     if not predictedPos or predictedPos == Vector3.new(0,0,0) then return end
     
-    -- Get right hand position
     local rightHand = localplayer.Character:FindFirstChild("RightHand") or localplayer.Character:FindFirstChild("Right Arm")
     local handPos = rightHand and rightHand.Position or lHRP.Position
     
-    -- Fire the shoot remote with correct arguments
     pcall(function()
         shootRemote:FireServer(
             CFrame.new(handPos),
@@ -1105,7 +1095,6 @@ function Modules.KillAura(enabled)
     end))
 end
 end
-
 do
     Modules.Config.NotifyGunDropped = false
 
@@ -1277,7 +1266,9 @@ function Modules.ChatRoles()
             es.SayMessageRequest:FireServer(msg, "Normal")
         end
     end
-enddo
+end
+
+do
     local timerConn = nil
     local timerGui = nil
 
@@ -1633,7 +1624,6 @@ Main:Code({
 + More features coming soon
     ]]
 })
-
 do
     local CharacterSection = Movement:Section({
         Title = "Movement",
@@ -2123,7 +2113,8 @@ do
             Modules.UpdateRoleNotify()
         end
     })
-enddo
+end
+do
     local buttonsSection = Buttons:Section({
         Title = "Buttons",
         Subtitle = "Customize your action Buttons",
